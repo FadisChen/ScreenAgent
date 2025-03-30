@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Agent - 網頁版</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 主控制面板 -->
+        <div id="control-panel" class="control-panel shadow">
+            <div class="panel-header">
+                <span id="status-text">準備就緒</span>
+                <div class="control-buttons">
+                    <button id="btn-settings" class="btn btn-sm btn-outline-light" title="設定">
+                        <i class="bi bi-gear-fill"></i>
+                    </button>
+                    <button id="btn-info" class="btn btn-sm btn-outline-light" title="關於">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="record-controls">
+                    <button id="btn-record" class="btn-record" title="開始錄製">
+                        <i class="bi bi-record-circle record-icon"></i>
+                    </button>
+                    <button id="btn-stop" class="btn-stop d-none" title="停止錄製">
+                        <i class="bi bi-stop-circle stop-icon"></i>
+                    </button>
+                </div>
+                <div class="input-area">
+                    <textarea id="prompt-input" class="form-control" placeholder="請輸入問題..."></textarea>
+                    <button id="btn-submit" class="btn btn-primary submit-btn" title="提交">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 對話歷史面板 -->
+        <div id="conversation-panel" class="conversation-panel shadow">
+            <div class="panel-header">
+                <span>對話視窗</span>
+                <div class="control-buttons">
+                    <button id="btn-clear-history" class="btn btn-sm btn-outline-light" title="清除歷史">
+                        <i class="bi bi-trash3-fill"></i>
+                    </button>
+                    <button id="btn-toggle-history" class="btn btn-sm btn-outline-light" title="隱藏歷史">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body conversation-container">
+                <div id="conversation-history" class="conversation-history">
+                    <!-- 對話記錄將在這裡動態添加 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定對話框 -->
+    <div class="modal fade" id="settings-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">設定</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settings-form">
+                        <div class="mb-3">
+                            <label for="api-key" class="form-label">Gemini API 金鑰</label>
+                            <input type="password" class="form-control" id="api-key" placeholder="請輸入您的 API 金鑰">
+                        </div>
+                        <div class="mb-3">
+                            <label for="gemini-model" class="form-label">Gemini 模型</label>
+                            <input type="text" class="form-control" id="gemini-model" value="gemini-2.0-flash-exp">
+                        </div>
+                        <div class="mb-3">
+                            <label for="capture-frequency" class="form-label">截圖頻率 (秒)</label>
+                            <input type="range" class="form-range" id="capture-frequency" min="0.5" max="5" step="0.5" value="1">
+                            <div class="text-center"><span id="frequency-value">1</span> 秒</div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="show-history" checked>
+                            <label class="form-check-label" for="show-history">顯示對話歷史</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="enable-tts" checked>
+                            <label class="form-check-label" for="enable-tts">啟用文字轉語音</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="voice-select" class="form-label">語音選擇</label>
+                            <select class="form-select" id="voice-select" disabled>
+                                <!-- 語音選項將動態添加 -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="system-prompt" class="form-label">系統提示詞</label>
+                            <textarea class="form-control" id="system-prompt" rows="5">你是一個智慧回覆助手，能夠分析桌面截圖並回答使用者的提問。你的回應方式遵循以下規則：
+與圖片相關的問題：
+仔細分析圖片內容，根據使用者的提問提供準確、清楚的指導與回答。
+若問題涉及技術支援，提供具體步驟或建議。
+若問題模糊，請要求使用者提供更多資訊，以確保回答準確。
+沒有圖片或與圖片無關的問題：
+以簡短、直接的方式進行回應，保持自然的對話風格。
+若問題超出你的知識範圍，可使用工具查詢最新資訊後回答。
+回覆風格：
+內容簡潔明瞭，避免冗長或不必要的細節。
+禁止使用表情符號、特殊符號或非文字內容。
+你應該始終確保回應的專業性與實用性，並根據問題的性質適當調整回覆方式，一律以繁體中文回覆。</textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-settings">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 關於對話框 -->
+    <div class="modal fade" id="info-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">關於 Screen Agent</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>螢幕助手 (Screen Agent) - 網頁版</h4>
+                    <p>一個智能網頁應用程式，能夠截取螢幕畫面並使用 Gemini AI 進行分析與回答問題。</p>
+                    
+                    <h5>功能特色</h5>
+                    <ul>
+                        <li>螢幕截圖分析：自動截取螢幕畫面並結合用戶問題發送到 Gemini AI 分析</li>
+                        <li>即時問答：針對螢幕上顯示的內容進行提問並取得即時回應</li>
+                        <li>語音朗讀：支援文字轉語音功能，可將 AI 回應以語音方式播放</li>
+                        <li>對話歷史：保存問答記錄，方便查閱</li>
+                        <li>自訂設定：可調整 API Key、模型選擇、截圖頻率等參數</li>
+                    </ul>
+
+                    <h5>隱私說明</h5>
+                    <p>本應用僅在需要時截取螢幕畫面，並只將畫面傳送到 Gemini API 進行分析。所有設定和數據均存儲在本地，不會被永久儲存或分享給第三方。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">了解</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 應用腳本 -->
+    <script src="js/settingsService.js"></script>
+    <script src="js/screenCapture.js"></script>
+    <script src="js/geminiService.js"></script>
+    <script src="js/speechService.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
