@@ -1,0 +1,184 @@
+﻿<Window x:Class="ScreenAgent.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScreenAgent"
+        mc:Ignorable="d"
+        Title="Screen Agent" Height="80" Width="650"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" Topmost="True" 
+        MouseDown="Window_MouseDown" Loaded="Window_Loaded">
+    <Window.Resources>
+        <!-- 圖標樣式 -->
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="20">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 功能按鈕樣式 -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#40FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="20">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#60FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#80FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 提交按鈕樣式 -->
+        <Style x:Key="SubmitButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="20">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2980b9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#1f6aa9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 對話歷史視窗樣式 -->
+        <Style x:Key="HistoryWindowStyle" TargetType="Window">
+            <Setter Property="WindowStyle" Value="None"/>
+            <Setter Property="AllowsTransparency" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Topmost" Value="True"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <!-- 主要工具列區域 (半透明背景) -->
+        <Border x:Name="mainToolbar" Height="80" VerticalAlignment="Bottom"
+                Background="#80000000" CornerRadius="10">
+            <Grid Margin="10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- 控件區域 -->
+                    <RowDefinition Height="Auto"/> <!-- 狀態消息區域 -->
+                </Grid.RowDefinitions>
+                
+                <!-- 控件區域 -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- 文字輸入框 -->
+                    <TextBox x:Name="txtPrompt" Grid.Column="0" Height="30" Margin="5,5,5,5"
+                             VerticalContentAlignment="Center" 
+                             Background="#60FFFFFF" Foreground="White" 
+                             BorderBrush="#30FFFFFF"
+                             Padding="10,0"/>
+                    
+                    <!-- 開始/結束按鈕 (使用圖示) -->
+                    <Button x:Name="btnStartStop" Grid.Column="1" 
+                            Style="{StaticResource ActionButtonStyle}" 
+                            Margin="5"
+                            Click="BtnStartStop_Click"
+                            ToolTip="開始/停止錄製">
+                        <Grid>
+                            <!-- 開始錄製圖標 (預設顯示) -->
+                            <TextBlock x:Name="iconRecord" FontFamily="Segoe MDL2 Assets" Text="&#xE714;" 
+                                      FontSize="18" Foreground="#7FFFD4" Visibility="Visible"/>
+                            
+                            <!-- 停止錄製圖標 (初始隱藏) -->
+                            <TextBlock x:Name="iconStop" FontFamily="Segoe MDL2 Assets" Text="&#xE71A;" 
+                                      FontSize="18" Foreground="#FF6B6B" Visibility="Collapsed"/>
+                        </Grid>
+                    </Button>
+                    
+                    <!-- 提交按鈕 -->
+                    <Button x:Name="btnSubmit" Grid.Column="2" 
+                            Style="{StaticResource ActionButtonStyle}" 
+                            Margin="5"
+                            Click="BtnSubmit_Click"
+                            ToolTip="提交查詢">
+                        <!-- 使用 Segoe MDL2 Assets 的發送圖標 -->
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE724;" 
+                                   FontSize="18" Foreground="White"/>
+                    </Button>
+                    
+                    <!-- 設定按鈕 (使用圖示樣式) -->
+                    <Button x:Name="btnSettings" Grid.Column="3" 
+                            Style="{StaticResource ActionButtonStyle}" 
+                            Margin="5"
+                            Click="BtnSettings_Click"
+                            ToolTip="設定">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" 
+                                   FontSize="18" Foreground="White"/>
+                    </Button>
+                    
+                    <!-- 關閉應用程式按鈕 (使用圖示樣式) -->
+                    <Button x:Name="btnExit" Grid.Column="4" 
+                            Style="{StaticResource ActionButtonStyle}" 
+                            Margin="5"
+                            Click="BtnExit_Click"
+                            ToolTip="關閉應用程式">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8BB;" 
+                                   FontSize="18" Foreground="#FFAA99"/>
+                    </Button>
+                </Grid>
+                
+                <!-- 狀態消息文字 - 位於所有控件下方 -->
+                <TextBlock x:Name="txtStatus" Grid.Row="1" Margin="6,0,6,2" 
+                           Foreground="#A0A0A0" FontSize="10" TextTrimming="CharacterEllipsis"
+                           HorizontalAlignment="Left"/>
+                
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

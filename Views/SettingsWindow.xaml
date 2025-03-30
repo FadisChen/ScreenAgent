@@ -1,0 +1,283 @@
+<Window x:Class="ScreenAgent.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="設定" Height="500" Width="550" 
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="#FF333333" ResizeMode="NoResize"
+        Topmost="True">
+    <Window.Resources>
+        <!-- 按鈕樣式 -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2980b9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#1f6aa9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- TextBox 樣式 -->
+        <Style x:Key="ModernTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="#40FFFFFF"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- PasswordBox 樣式 -->
+        <Style x:Key="ModernPasswordBox" TargetType="{x:Type PasswordBox}">
+            <Setter Property="Background" Value="#40FFFFFF"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- CheckBox 樣式 -->
+        <Style x:Key="ModernCheckBox" TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- ComboBox 樣式 -->
+        <Style x:Key="ModernComboBox" TargetType="{x:Type ComboBox}">
+            <Setter Property="Background" Value="#40FFFFFF"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton" 
+                                         Focusable="false"
+                                         IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                         ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="1"
+                                                Background="{TemplateBinding Background}"
+                                                CornerRadius="4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="20" />
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter Grid.Column="0"
+                                                                HorizontalAlignment="Left"
+                                                                Margin="8,0,0,0"
+                                                                VerticalAlignment="Center" />
+                                                <Path Grid.Column="1"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     Data="M 0 0 L 4 4 L 8 0 Z"
+                                                     Fill="#FFFFFF" />
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter Name="ContentSite"
+                                            IsHitTestVisible="False"
+                                            Content="{TemplateBinding SelectionBoxItem}"
+                                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                            Margin="10,3,30,3"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left" />
+                            <Popup Name="Popup"
+                                 Placement="Bottom"
+                                 IsOpen="{TemplateBinding IsDropDownOpen}"
+                                 AllowsTransparency="True"
+                                 Focusable="False"
+                                 PopupAnimation="Slide">
+                                <Grid Name="DropDown"
+                                    SnapsToDevicePixels="True"
+                                    MinWidth="{TemplateBinding ActualWidth}"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                          Background="#80000000"
+                                          BorderThickness="1"
+                                          BorderBrush="#30FFFFFF"
+                                          CornerRadius="0,0,4,4"/>
+                                    <ScrollViewer Margin="0,0,0,0">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Label 樣式 -->
+        <Style x:Key="ModernLabel" TargetType="{x:Type Label}">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="10" Background="Transparent">
+        <Grid Margin="25">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- 標題 -->
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3" 
+                     Text="螢幕助手設定" 
+                     Foreground="White" 
+                     FontSize="22" 
+                     FontWeight="Bold"
+                     HorizontalAlignment="Center"
+                     Margin="0,0,0,20"/>
+            
+            <!-- API Key 設定 -->
+            <Label Grid.Row="1" Grid.Column="0" Content="Gemini API Key:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <PasswordBox x:Name="txtApiKey" Grid.Row="1" Grid.Column="1" 
+                      Margin="10,5" 
+                      Style="{StaticResource ModernPasswordBox}"/>
+            
+            <!-- Gemini 模型設定 -->
+            <Label Grid.Row="2" Grid.Column="0" Content="Gemini 模型:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <TextBox x:Name="txtGeminiModel" Grid.Row="2" Grid.Column="1" 
+                   Margin="10,5" 
+                   Style="{StaticResource ModernTextBox}"/>
+            
+            <!-- 顯示對話訊息設定 -->
+            <Label Grid.Row="3" Grid.Column="0" Content="顯示對話訊息:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <CheckBox x:Name="chkShowHistory" Grid.Row="3" Grid.Column="1" 
+                    Margin="15,10" 
+                    Style="{StaticResource ModernCheckBox}"
+                    VerticalAlignment="Center"/>
+            
+            <!-- 截圖頻率設定 -->
+            <Label Grid.Row="4" Grid.Column="0" Content="截圖頻率 (秒):" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" 
+                      VerticalAlignment="Center" Margin="10,5">
+                <Slider x:Name="sliderFrequency" Minimum="1" Maximum="10" Width="200"
+                      IsSnapToTickEnabled="True" TickFrequency="1" Value="1"
+                      ValueChanged="SliderFrequency_ValueChanged"
+                      Foreground="White"/>
+                <TextBlock x:Name="txtFrequency" Margin="15,0,0,0" 
+                         VerticalAlignment="Center" Text="1" 
+                         Foreground="White"/>
+            </StackPanel>
+
+            <!-- 啟用文字轉語音 -->
+            <Label Grid.Row="5" Grid.Column="0" Content="啟用文字轉語音:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <CheckBox x:Name="chkEnableTTS" Grid.Row="5" Grid.Column="1" 
+                    Margin="15,10" 
+                    Style="{StaticResource ModernCheckBox}"
+                    VerticalAlignment="Center"/>
+            
+            <!-- 語音設定 -->
+            <Label Grid.Row="6" Grid.Column="0" Content="文字轉語音聲音:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <ComboBox x:Name="cmbVoices" Grid.Row="6" Grid.Column="1" 
+                    Background="#60FFFFFF" Foreground="White" 
+                    Margin="10,5" 
+                    Style="{StaticResource ModernComboBox}"/>
+                    
+            <!-- System Prompt 設定 -->
+            <Label Grid.Row="7" Grid.Column="0" Content="System Prompt:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Top" Margin="0,10,0,0"/>
+            <TextBox x:Name="txtSystemPrompt" Grid.Row="7" Grid.Column="1" Grid.RowSpan="2"
+                   Margin="10,10" Height="120"
+                   Style="{StaticResource ModernTextBox}"
+                   TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto"
+                   AcceptsReturn="True"/>
+
+            <!-- 按鈕區域 -->
+            <StackPanel Grid.Row="9" Grid.ColumnSpan="3" Orientation="Horizontal" 
+                      HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button x:Name="btnSave" Content="儲存" Width="100" Margin="5,0" 
+                      Style="{StaticResource ModernButton}"
+                      Click="BtnSave_Click"/>
+                <Button x:Name="btnCancel" Content="取消" Width="100" Margin="5,0" 
+                      Style="{StaticResource ModernButton}"
+                      Background="#95a5a6"
+                      Click="BtnCancel_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
