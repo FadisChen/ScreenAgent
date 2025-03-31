@@ -32,7 +32,7 @@
         
         <!-- 功能按鈕樣式 -->
         <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#40FFFFFF"/>
+            <Setter Property="Background" Value="#80404040"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -42,16 +42,18 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="20">
+                                CornerRadius="20"
+                                BorderBrush="#60FFFFFF"
+                                BorderThickness="1">
                             <ContentPresenter HorizontalAlignment="Center" 
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#60FFFFFF"/>
+                                <Setter Property="Background" Value="#A0606060"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#80FFFFFF"/>
+                                <Setter Property="Background" Value="#C0707070"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -71,7 +73,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="20">
+                                CornerRadius="20"
+                                BorderBrush="#60FFFFFF"
+                                BorderThickness="1">
                             <ContentPresenter HorizontalAlignment="Center" 
                                               VerticalAlignment="Center"/>
                         </Border>
@@ -100,7 +104,8 @@
     <Grid>
         <!-- 主要工具列區域 (半透明背景) -->
         <Border x:Name="mainToolbar" Height="80" VerticalAlignment="Bottom"
-                Background="#60FFFFFF" CornerRadius="10">
+                Background="#80404040" CornerRadius="10"
+                BorderBrush="#50FFFFFF" BorderThickness="1">
             <Grid Margin="10,5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- 控件區域 -->
@@ -120,36 +125,42 @@
                     <!-- 文字輸入框 -->
                     <TextBox x:Name="txtPrompt" Grid.Column="0" Height="30" Margin="5,5,5,5"
                              VerticalContentAlignment="Center" 
-                             Background="#80000000" Foreground="White" 
-                             BorderBrush="#30FFFFFF"
+                             Background="#A0202020" Foreground="White" 
+                             BorderBrush="#50FFFFFF"
                              Padding="10,0"/>
                     
-                    <!-- 開始/結束按鈕 (使用圖示) -->
-                    <Button x:Name="btnStartStop" Grid.Column="1" 
+                    <!-- 麥克風按鈕 (語音輸入) -->
+                    <Button x:Name="btnMicrophone" Grid.Column="1" 
                             Style="{StaticResource ActionButtonStyle}" 
                             Margin="5"
-                            Click="BtnStartStop_Click"
-                            ToolTip="開始/停止錄製">
+                            Click="BtnMicrophone_Click"
+                            ToolTip="語音輸入">
                         <Grid>
-                            <!-- 開始錄製圖標 (預設顯示) -->
-                            <TextBlock x:Name="iconRecord" FontFamily="Segoe MDL2 Assets" Text="&#xE714;" 
-                                      FontSize="18" Foreground="#7FFFD4" Visibility="Visible"/>
+                            <!-- 麥克風圖標 (預設顯示) -->
+                            <TextBlock x:Name="iconMicNormal" FontFamily="Segoe MDL2 Assets" Text="&#xE720;" 
+                                      FontSize="18" Foreground="#50E5FF" Visibility="Visible"/>
                             
-                            <!-- 停止錄製圖標 (初始隱藏) -->
-                            <TextBlock x:Name="iconStop" FontFamily="Segoe MDL2 Assets" Text="&#xE71A;" 
-                                      FontSize="18" Foreground="#FF6B6B" Visibility="Collapsed"/>
+                            <!-- 麥克風聆聽中圖標 (初始隱藏) -->
+                            <TextBlock x:Name="iconMicListening" FontFamily="Segoe MDL2 Assets" Text="&#xE720;" 
+                                      FontSize="18" Foreground="#FF5050" Visibility="Collapsed"/>
                         </Grid>
                     </Button>
                     
-                    <!-- 提交按鈕 -->
-                    <Button x:Name="btnSubmit" Grid.Column="2" 
+                    <!-- 開始/結束按鈕 (使用圖示) -->
+                    <Button x:Name="btnStartStop" Grid.Column="2" 
                             Style="{StaticResource ActionButtonStyle}" 
                             Margin="5"
-                            Click="BtnSubmit_Click"
-                            ToolTip="提交查詢">
-                        <!-- 使用 Segoe MDL2 Assets 的發送圖標 -->
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE724;" 
-                                   FontSize="18" Foreground="White"/>
+                            Click="BtnStartStop_Click"
+                            ToolTip="影像輔助模式開關">
+                        <Grid>
+                            <!-- 開始錄製圖標 (預設顯示) - 睜眼 -->
+                            <TextBlock x:Name="iconRecord" FontFamily="Segoe MDL2 Assets" Text="&#xE7B3;" 
+                                      FontSize="18" Foreground="#7FFFD4" Visibility="Visible"/>
+                            
+                            <!-- 停止錄製圖標 (初始隱藏) - 閉眼 -->
+                            <TextBlock x:Name="iconStop" FontFamily="Segoe MDL2 Assets" Text="&#xF19E;" 
+                                      FontSize="18" Foreground="#FF6B6B" Visibility="Collapsed"/>
+                        </Grid>
                     </Button>
                     
                     <!-- 設定按鈕 (使用圖示樣式) -->
@@ -159,7 +170,7 @@
                             Click="BtnSettings_Click"
                             ToolTip="設定">
                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" 
-                                   FontSize="18" Foreground="White"/>
+                                   FontSize="18" Foreground="#90CAF9"/>
                     </Button>
                     
                     <!-- 關閉應用程式按鈕 (使用圖示樣式) -->
@@ -169,13 +180,13 @@
                             Click="BtnExit_Click"
                             ToolTip="關閉應用程式">
                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8BB;" 
-                                   FontSize="18" Foreground="#FFAA99"/>
+                                   FontSize="18" Foreground="#FF9999"/>
                     </Button>
                 </Grid>
                 
                 <!-- 狀態消息文字 - 位於所有控件下方 -->
                 <TextBlock x:Name="txtStatus" Grid.Row="1" Margin="6,0,6,2" 
-                           Foreground="#A0A0A0" FontSize="10" TextTrimming="CharacterEllipsis"
+                           Foreground="#E0E0E0" FontSize="10" TextTrimming="CharacterEllipsis"
                            HorizontalAlignment="Left"/>
                 
             </Grid>

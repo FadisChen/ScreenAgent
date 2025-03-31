@@ -39,6 +39,9 @@ namespace ScreenAgent.Views
             // 啟用文字轉語音
             chkEnableTTS.IsChecked = _settingsService.GetEnableTextToSpeech();
             
+            // 語音識別相關設定
+            chkEnableSTT.IsChecked = _settingsService.GetEnableSpeechToText();
+            
             // 載入 System Prompt
             txtSystemPrompt.Text = _settingsService.GetSystemPrompt();
             
@@ -91,6 +94,9 @@ namespace ScreenAgent.Views
             _settingsService.SetShowConversationHistory(chkShowHistory.IsChecked ?? true);
             _settingsService.SetCaptureFrequencyInSeconds((int)sliderFrequency.Value);
             _settingsService.SetEnableTextToSpeech(chkEnableTTS.IsChecked ?? true);
+            
+            // 儲存語音識別相關設定
+            _settingsService.SetEnableSpeechToText(chkEnableSTT.IsChecked ?? true);
             
             // 儲存 System Prompt
             _settingsService.SetSystemPrompt(txtSystemPrompt.Text);

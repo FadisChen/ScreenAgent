@@ -146,6 +146,13 @@ namespace ScreenAgent.Services
             // 清空截圖集合，準備收集下一批
             _capturedImages.Clear();
         }
+        
+        // 明確清空截圖集合的方法
+        public void ClearCapturedImages()
+        {
+            // 清空截圖集合
+            _capturedImages.Clear();
+        }
 
         private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
         {

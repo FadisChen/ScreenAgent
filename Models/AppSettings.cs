@@ -8,6 +8,11 @@ namespace ScreenAgent.Models
         public string TextToSpeechVoiceName { get; set; } = string.Empty;
         public string GeminiModel { get; set; } = "gemini-2.0-flash-exp";
         public bool EnableTextToSpeech { get; set; } = true;
+        
+        // 語音識別相關設定 (免費方案)
+        public string SpeechLanguage { get; set; } = "zh-TW";
+        public bool EnableSpeechToText { get; set; } = true;
+        
         public string SystemPrompt { get; set; } = @"你是一個智慧回覆助手，能夠分析桌面截圖並回答使用者的提問。你的回應方式遵循以下規則：
 與圖片相關的問題：
 仔細分析圖片內容，根據使用者的提問提供準確、清楚的指導與回答。
