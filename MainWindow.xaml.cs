@@ -54,7 +54,7 @@ public partial class MainWindow : Window
         var screenHeight = SystemParameters.PrimaryScreenHeight;
         
         this.Left = (screenWidth - this.Width) / 2;
-        this.Top = screenHeight - this.Height - 20;
+        this.Top = screenHeight - this.Height - 100;
     }
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -217,8 +217,6 @@ public partial class MainWindow : Window
         string response = await _geminiService.GetResponseFromImageBatchAndTextAsync(imageBytesList, userPrompt);
         response = response.Replace("**","");
         
-        // 清空歷史，只顯示當前響應
-        _historyWindow.ClearHistory();
         _historyWindow.DisplayResponse(userPrompt, response);
         
         // 文字轉語音

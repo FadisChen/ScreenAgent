@@ -100,7 +100,7 @@
     <Grid>
         <!-- 主要工具列區域 (半透明背景) -->
         <Border x:Name="mainToolbar" Height="80" VerticalAlignment="Bottom"
-                Background="#80000000" CornerRadius="10">
+                Background="#60FFFFFF" CornerRadius="10">
             <Grid Margin="10,5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- 控件區域 -->
@@ -120,7 +120,7 @@
                     <!-- 文字輸入框 -->
                     <TextBox x:Name="txtPrompt" Grid.Column="0" Height="30" Margin="5,5,5,5"
                              VerticalContentAlignment="Center" 
-                             Background="#60FFFFFF" Foreground="White" 
+                             Background="#80000000" Foreground="White" 
                              BorderBrush="#30FFFFFF"
                              Padding="10,0"/>
                     
