@@ -42,6 +42,9 @@ namespace ScreenAgent.Views
             // 語音識別相關設定
             chkEnableSTT.IsChecked = _settingsService.GetEnableSpeechToText();
             
+            // 發送訊息時截圖
+            chkCaptureOnSend.IsChecked = _settingsService.GetCaptureOnSend();
+            
             // 載入 System Prompt
             txtSystemPrompt.Text = _settingsService.GetSystemPrompt();
             
@@ -97,6 +100,9 @@ namespace ScreenAgent.Views
             
             // 儲存語音識別相關設定
             _settingsService.SetEnableSpeechToText(chkEnableSTT.IsChecked ?? true);
+            
+            // 儲存發送訊息時截圖設定
+            _settingsService.SetCaptureOnSend(chkCaptureOnSend.IsChecked ?? true);
             
             // 儲存 System Prompt
             _settingsService.SetSystemPrompt(txtSystemPrompt.Text);

@@ -82,6 +82,9 @@ namespace ScreenAgent.Services
         
         public bool GetEnableSpeechToText() => _settings.EnableSpeechToText;
         
+        // 取得送出訊息時是否要截圖
+        public bool GetCaptureOnSend() => _settings.CaptureOnSend;
+        
         // 修改設定值的方法，增加不自動保存的選項
         private void SetValue<T>(Action<T> setter, T value)
         {
@@ -108,6 +111,9 @@ namespace ScreenAgent.Services
         public void SetSpeechLanguage(string language) => SetValue(l => _settings.SpeechLanguage = l, language);
         
         public void SetEnableSpeechToText(bool enable) => SetValue(e => _settings.EnableSpeechToText = e, enable);
+        
+        // 設定送出訊息時是否要截圖
+        public void SetCaptureOnSend(bool enable) => SetValue(e => _settings.CaptureOnSend = e, enable);
         
         // 批次更新設定而不是每次都保存
         public void BeginUpdate()

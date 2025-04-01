@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="設定" Height="530" Width="550" 
+        Title="設定" Height="570" Width="550" 
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True"
         Background="#FF333333" ResizeMode="NoResize"
@@ -329,18 +329,27 @@
                     Style="{StaticResource ModernCheckBox}"
                     VerticalAlignment="Center"/>
                     
+            <!-- 發送訊息時截圖 -->
+            <Label Grid.Row="8" Grid.Column="0" Content="發送訊息時截圖:" 
+                 Style="{StaticResource ModernLabel}"
+                 VerticalAlignment="Center"/>
+            <CheckBox x:Name="chkCaptureOnSend" Grid.Row="8" Grid.Column="1" 
+                    Margin="15,10" 
+                    Style="{StaticResource ModernCheckBox}"
+                    VerticalAlignment="Center"/>
+                    
             <!-- System Prompt 設定 -->
-            <Label Grid.Row="8" Grid.Column="0" Content="System Prompt:" 
+            <Label Grid.Row="9" Grid.Column="0" Content="系統提示設定:" 
                  Style="{StaticResource ModernLabel}"
                  VerticalAlignment="Top" Margin="0,10,0,0"/>
-            <TextBox x:Name="txtSystemPrompt" Grid.Row="8" Grid.Column="1" Grid.RowSpan="2"
+            <TextBox x:Name="txtSystemPrompt" Grid.Row="9" Grid.Column="1" Grid.RowSpan="2"
                    Margin="10,10" Height="120"
                    Style="{StaticResource SystemPromptTextBoxStyle}"
                    TextWrapping="Wrap"
                    AcceptsReturn="True"/>
 
             <!-- 按鈕區域 -->
-            <StackPanel Grid.Row="10" Grid.ColumnSpan="3" Orientation="Horizontal" 
+            <StackPanel Grid.Row="11" Grid.ColumnSpan="3" Orientation="Horizontal" 
                       HorizontalAlignment="Right" Margin="0,20,0,0">
                 <Button x:Name="btnSave" Content="儲存" Width="100" Margin="5,0" 
                       Style="{StaticResource ModernButton}"

@@ -103,6 +103,12 @@ public partial class MainWindow : Window
             // 先中斷正在播放的語音
             _speechService.Stop();
             
+            // 強制隱藏對話視窗，不考慮設定值
+            if (_historyWindow != null)
+            {
+                _historyWindow.Visibility = Visibility.Collapsed;
+            }
+            
             _screenCaptureService.StartCapturing();
             _isCapturing = true;
             
@@ -132,6 +138,9 @@ public partial class MainWindow : Window
             // 切換圖標 - 顯示開始圖標，隱藏停止圖標
             iconRecord.Visibility = Visibility.Visible;
             iconStop.Visibility = Visibility.Collapsed;
+            
+            // 根據設定重新決定對話視窗顯示狀態
+            UpdateHistoryWindowVisibility();
             
             // 更新狀態
             SetStatus("影像輔助模式已關閉");
@@ -178,6 +187,9 @@ public partial class MainWindow : Window
             response = response.Replace("**","");
             
             _historyWindow.DisplayResponse(userPrompt, response);
+            
+            // 根據設定決定是否顯示對話歷史視窗
+            UpdateHistoryWindowVisibility();
             
             // 文字轉語音
             _speechService.Speak(response);
@@ -276,9 +288,9 @@ public partial class MainWindow : Window
         base.OnClosed(e);
     }
 
-    private void BtnSubmit_Click(object sender, RoutedEventArgs e)
+    private async void BtnSubmit_Click(object sender, RoutedEventArgs e)
     {
-        SubmitQuery();
+        await SubmitQueryAsync();
     }
 
     private void UpdateHistoryWindowVisibility()
@@ -408,12 +420,12 @@ public partial class MainWindow : Window
         {
             e.Handled = true;  // 防止 Enter 鍵換行
             
-            // 相當於點擊提交按鈕
-            SubmitQuery();
+            // 相當於點擊提交按鈕，使用非同步方式呼叫
+            _ = SubmitQueryAsync();
         }
     }
     
-    private void SubmitQuery()
+    private async Task SubmitQueryAsync()
     {
         // 取得輸入文字
         string userPrompt = txtPrompt.Text.Trim();
@@ -444,11 +456,58 @@ public partial class MainWindow : Window
             // 還原按鈕圖示
             iconRecord.Visibility = Visibility.Visible;
             iconStop.Visibility = Visibility.Collapsed;
+            
+            // 根據設定恢復對話視窗顯示狀態
+            UpdateHistoryWindowVisibility();
         }
         else
         {
-            // 如果沒有在截圖，則直接提交文本查詢
-            SubmitTextOnlyQuery(userPrompt);
+            // 檢查發送訊息時截圖的設定
+            bool captureOnSend = _settingsService.GetCaptureOnSend();
+            
+            if (captureOnSend)
+            {
+                try
+                {
+                    // 暫時隱藏對話視窗以便乾淨截圖
+                    bool originalVisibility = _historyWindow.Visibility == Visibility.Visible;
+                    if (_historyWindow != null)
+                    {
+                        _historyWindow.Visibility = Visibility.Collapsed;
+                    }
+                    
+                    try
+                    {
+                        // 短暫延遲以確保UI已完全更新
+                        await Task.Delay(100);
+                        
+                        // 擷取一次螢幕截圖
+                        var imageBytes = _screenCaptureService.CaptureScreenSingle();
+                        List<byte[]> imageList = new List<byte[]> { imageBytes };
+                        
+                        // 使用包含截圖的方式處理請求
+                        await ProcessGeminiRequestAsync(imageList, userPrompt);
+                    }
+                    finally
+                    {
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"截圖失敗: {ex.Message}", 
+                                    "錯誤", 
+                                    MessageBoxButton.OK, 
+                                    MessageBoxImage.Error);
+                    
+                    // 使用純文字查詢作為後備方案
+                    SubmitTextOnlyQuery(userPrompt);
+                }
+            }
+            else
+            {
+                // 如果沒有在截圖，則直接提交文本查詢
+                SubmitTextOnlyQuery(userPrompt);
+            }
         }
         
         // 清空輸入框
@@ -459,10 +518,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            // 顯示處理中的消息
             SetStatus("處理中...");
 
-            // 調用 Gemini API 處理不含截圖的查詢
             await ProcessGeminiRequestAsync(new List<byte[]>(), userPrompt);
         }
         catch (Exception ex)
