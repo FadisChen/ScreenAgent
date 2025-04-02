@@ -1,5 +1,4 @@
-﻿using ScreenAgent.Models;
-using ScreenAgent.Services;
+﻿using ScreenAgent.Services;
 using ScreenAgent.Views;
 using System.Windows;
 using System.Windows.Input;
@@ -18,7 +17,7 @@ public partial class MainWindow : Window
     private readonly SpeechToTextService _speechToTextService;
     private bool _isCapturing = false;
     private bool _isListening = false;
-    private ConversationHistoryWindow _historyWindow;
+    private ConversationWindow _historyWindow;
 
     public MainWindow()
     {
@@ -32,7 +31,7 @@ public partial class MainWindow : Window
         _speechToTextService = new SpeechToTextService(_settingsService);
         
         // 創建對話歷史視窗（但不顯示）
-        _historyWindow = new ConversationHistoryWindow();
+        _historyWindow = new ConversationWindow();
         
         // 註冊事件
         _screenCaptureService.ScreensCaptureBatch += OnScreensCaptureBatch;
@@ -288,11 +287,6 @@ public partial class MainWindow : Window
         base.OnClosed(e);
     }
 
-    private async void BtnSubmit_Click(object sender, RoutedEventArgs e)
-    {
-        await SubmitQueryAsync();
-    }
-
     private void UpdateHistoryWindowVisibility()
     {
         // 根據設定決定是否顯示對話歷史視窗
@@ -520,7 +514,20 @@ public partial class MainWindow : Window
         {
             SetStatus("處理中...");
 
-            await ProcessGeminiRequestAsync(new List<byte[]>(), userPrompt);
+            // 使用新的純文字回應方法而不是包含空圖片列表的多模態方法
+            string response = await _geminiService.GetResponseFromTextAsync(userPrompt);
+            response = response.Replace("**","");
+            
+            _historyWindow.DisplayResponse(userPrompt, response);
+            
+            // 根據設定決定是否顯示對話歷史視窗
+            UpdateHistoryWindowVisibility();
+            
+            // 文字轉語音
+            _speechService.Speak(response);
+            
+            // 更新狀態
+            SetStatus("已完成回應");
         }
         catch (Exception ex)
         {

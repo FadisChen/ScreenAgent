@@ -1,7 +1,6 @@
-using System;
-using System.Windows;
-using System.Linq;
 using ScreenAgent.Services;
+using System.Windows;
+using ScreenAgent.Models;
 
 namespace ScreenAgent.Views
 {
@@ -125,6 +124,5 @@ namespace ScreenAgent.Views
             DialogResult = false;
             Close();
         }
-        
     }
 }

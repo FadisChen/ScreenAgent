@@ -85,6 +85,9 @@ namespace ScreenAgent.Services
         // 取得送出訊息時是否要截圖
         public bool GetCaptureOnSend() => _settings.CaptureOnSend;
         
+        // 取得工具模式設定
+        public ToolMode GetToolMode() => _settings.ToolMode;
+        
         // 修改設定值的方法，增加不自動保存的選項
         private void SetValue<T>(Action<T> setter, T value)
         {
@@ -114,6 +117,9 @@ namespace ScreenAgent.Services
         
         // 設定送出訊息時是否要截圖
         public void SetCaptureOnSend(bool enable) => SetValue(e => _settings.CaptureOnSend = e, enable);
+        
+        // 設定工具模式
+        public void SetToolMode(ToolMode mode) => SetValue(m => _settings.ToolMode = m, mode);
         
         // 批次更新設定而不是每次都保存
         public void BeginUpdate()

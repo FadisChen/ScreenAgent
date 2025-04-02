@@ -1,14 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.IO;
-using System.Threading;
-using System.Speech.Recognition;
-using System.Globalization;
-using System.Runtime.InteropServices;
 using NAudio.Wave;
+using System.Globalization;
+using System.Speech.Recognition;
+using System.Windows;
 
 namespace ScreenAgent.Services
 {

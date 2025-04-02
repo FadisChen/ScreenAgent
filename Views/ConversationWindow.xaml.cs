@@ -1,13 +1,11 @@
-using System;
 using System.Windows;
 using System.Windows.Input;
-using ScreenAgent.Models;
 
 namespace ScreenAgent.Views
 {
-    public partial class ConversationHistoryWindow : Window
+    public partial class ConversationWindow : Window
     {
-        public ConversationHistoryWindow()
+        public ConversationWindow()
         {
             InitializeComponent();
             
