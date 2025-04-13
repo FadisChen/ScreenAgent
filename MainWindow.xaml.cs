@@ -2,6 +2,10 @@
 using ScreenAgent.Views;
 using System.Windows;
 using System.Windows.Input;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ScreenAgent.Models;
 
 namespace ScreenAgent;
 
@@ -14,9 +18,8 @@ public partial class MainWindow : Window
     private readonly ScreenCaptureService _screenCaptureService;
     private readonly GeminiService _geminiService;
     private readonly TextToSpeechService _speechService;
-    private readonly SpeechToTextService _speechToTextService;
+    private readonly SpeechRecognitionService _speechRecognitionService;
     private bool _isCapturing = false;
-    private bool _isListening = false;
     private ConversationWindow _historyWindow;
 
     public MainWindow()
@@ -28,15 +31,15 @@ public partial class MainWindow : Window
         _screenCaptureService = new ScreenCaptureService(_settingsService);
         _geminiService = new GeminiService(_settingsService);
         _speechService = new TextToSpeechService(_settingsService);
-        _speechToTextService = new SpeechToTextService(_settingsService);
+        _speechRecognitionService = new SpeechRecognitionService(_settingsService);
         
         // 創建對話歷史視窗（但不顯示）
         _historyWindow = new ConversationWindow();
         
         // 註冊事件
         _screenCaptureService.ScreensCaptureBatch += OnScreensCaptureBatch;
-        _speechToTextService.SpeechRecognized += OnSpeechRecognized;
-        _speechToTextService.SilenceDetected += OnSilenceDetected;
+        _speechRecognitionService.SpeechRecognized += OnSpeechRecognized;
+        _speechRecognitionService.RecognitionStateChanged += OnRecognitionStateChanged;
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -269,12 +272,6 @@ public partial class MainWindow : Window
     
     protected override void OnClosed(EventArgs e)
     {
-        // 確保停止語音識別
-        if (_isListening)
-        {
-            StopListening();
-        }
-        
         // 確保停止截圖
         if (_isCapturing)
         {
@@ -299,114 +296,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void BtnMicrophone_Click(object sender, RoutedEventArgs e)
-    {
-        if (_isListening)
-        {
-            StopListening();
-        }
-        else
-        {
-            StartListening();
-        }
-    }
-    
-    private async void StartListening()
-    {
-        try
-        {
-            // 先中斷正在播放的語音
-            _speechService.Stop();
-            
-            // 清空輸入框
-            txtPrompt.Text = string.Empty;
-            
-            // 變更麥克風按鈕外觀
-            iconMicNormal.Visibility = Visibility.Collapsed;
-            iconMicListening.Visibility = Visibility.Visible;
-            
-            try
-            {
-                // 開始語音識別
-                await _speechToTextService.StartListeningAsync();
-                _isListening = true;
-                
-                // 更新狀態
-                SetStatus("語音識別中... 請說出您的問題");
-            }
-            catch (Exception ex)
-            {
-                // 如果語音識別失敗，恢復按鈕狀態
-                iconMicNormal.Visibility = Visibility.Visible;
-                iconMicListening.Visibility = Visibility.Collapsed;
-                
-                // 顯示錯誤訊息 (已經在服務中顯示了詳細錯誤)
-                SetStatus("語音識別無法啟動");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Windows.MessageBox.Show($"啟動語音識別失敗: {ex.Message}", 
-                            "錯誤", 
-                            MessageBoxButton.OK, 
-                            MessageBoxImage.Error);
-            
-            // 恢復按鈕狀態
-            iconMicNormal.Visibility = Visibility.Visible;
-            iconMicListening.Visibility = Visibility.Collapsed;
-        }
-    }
-    
-    private async void StopListening()
-    {
-        if (!_isListening)
-            return;
-            
-        try
-        {
-            // 停止語音識別
-            await _speechToTextService.StopListeningAsync();
-            _isListening = false;
-            
-            // 變更麥克風按鈕外觀
-            iconMicNormal.Visibility = Visibility.Visible;
-            iconMicListening.Visibility = Visibility.Collapsed;
-            
-            // 更新狀態
-            SetStatus("語音識別已停止");
-        }
-        catch (Exception ex)
-        {
-            System.Windows.MessageBox.Show($"停止語音識別失敗: {ex.Message}", 
-                            "錯誤", 
-                            MessageBoxButton.OK, 
-                            MessageBoxImage.Error);
-        }
-    }
-    
-    private void OnSpeechRecognized(object sender, string recognizedText)
-    {
-        // 在UI線程上執行
-        this.Dispatcher.Invoke(() => 
-        {
-            // 將識別的文字添加到文字框
-            txtPrompt.Text = recognizedText;
-        });
-    }
-    
-    private void OnSilenceDetected(object sender, EventArgs e)
-    {
-        // 在UI線程上執行
-        this.Dispatcher.Invoke(() => 
-        {
-            // 檢測到靜音，自動停止語音識別
-            if (_isListening)
-            {
-                StopListening();
-            }
-        });
-    }
-
     private void TxtPrompt_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         // 按下 Enter 鍵提交
@@ -429,13 +318,13 @@ public partial class MainWindow : Window
             
         // 中斷任何正在播放的語音
         _speechService.Stop();
-        
-        // 如果語音識別還在進行中，先停止
-        if (_isListening)
+
+        //如果麥克風已開啟，需關閉麥克風
+        if (_speechRecognitionService.IsListening())
         {
-            StopListening();
+            _speechRecognitionService.StopListening();
         }
-        
+
         SetStatus("正在處理您的請求...");
         
         if (_isCapturing)
@@ -536,6 +425,57 @@ public partial class MainWindow : Window
                             MessageBoxButton.OK, 
                             MessageBoxImage.Error);
             SetStatus("發生錯誤，請重試");
+        }
+    }
+
+    private void OnSpeechRecognized(object sender, string recognizedText)
+    {
+        // 在UI線程上更新TextBox
+        this.Dispatcher.Invoke(() =>
+        {
+            // 將辨識到的文字添加到目前輸入框的文字後
+            txtPrompt.Text += (txtPrompt.Text.Length > 0 ? " " : "") + recognizedText;
+            txtPrompt.CaretIndex = txtPrompt.Text.Length; // 將游標移至末尾
+            txtPrompt.Focus();
+        });
+    }
+
+    private void OnRecognitionStateChanged(object sender, bool isListening)
+    {
+        // 在UI線程上更新麥克風圖標
+        this.Dispatcher.Invoke(() =>
+        {
+            iconMic.Visibility = isListening ? Visibility.Collapsed : Visibility.Visible;
+            iconMicRecording.Visibility = isListening ? Visibility.Visible : Visibility.Collapsed;
+            
+            // 更新狀態文字
+            if (isListening)
+            {
+                SetStatus("正在聆聽，請說話...");
+            }
+            else
+            {
+                SetStatus("語音輸入已停止");
+            }
+        });
+    }
+
+    private void BtnMicrophone_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_speechRecognitionService.IsAvailable())
+        {
+            System.Windows.MessageBox.Show("語音識別功能不可用，請確認系統已安裝必要的語音套件。", 
+                "語音辨識錯誤", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        
+        if (_speechRecognitionService.IsListening())
+        {
+            _speechRecognitionService.StopListening();
+        }
+        else
+        {
+            _speechRecognitionService.StartListening();
         }
     }
 }

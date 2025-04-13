@@ -92,7 +92,7 @@
             </Setter>
         </Style>
         
-        <!-- 對話歷史視窗樣式 -->
+        <!-- 對話視窗樣式 -->
         <Style x:Key="HistoryWindowStyle" TargetType="Window">
             <Setter Property="WindowStyle" Value="None"/>
             <Setter Property="AllowsTransparency" Value="True"/>
@@ -129,20 +129,20 @@
                              BorderBrush="#50FFFFFF"
                              Padding="10,0"/>
                     
-                    <!-- 麥克風按鈕 (語音輸入) -->
+                    <!-- 麥克風按鈕 -->
                     <Button x:Name="btnMicrophone" Grid.Column="1" 
                             Style="{StaticResource ActionButtonStyle}" 
                             Margin="5"
                             Click="BtnMicrophone_Click"
-                            ToolTip="語音輸入">
+                            ToolTip="語音轉文字">
                         <Grid>
                             <!-- 麥克風圖標 (預設顯示) -->
-                            <TextBlock x:Name="iconMicNormal" FontFamily="Segoe MDL2 Assets" Text="&#xE720;" 
-                                      FontSize="18" Foreground="#50E5FF" Visibility="Visible"/>
+                            <TextBlock x:Name="iconMic" FontFamily="Segoe MDL2 Assets" Text="&#xE720;" 
+                                      FontSize="18" Foreground="#90CAF9" Visibility="Visible"/>
                             
-                            <!-- 麥克風聆聽中圖標 (初始隱藏) -->
-                            <TextBlock x:Name="iconMicListening" FontFamily="Segoe MDL2 Assets" Text="&#xE720;" 
-                                      FontSize="18" Foreground="#FF5050" Visibility="Collapsed"/>
+                            <!-- 錄音中圖標 (初始隱藏) -->
+                            <TextBlock x:Name="iconMicRecording" FontFamily="Segoe MDL2 Assets" Text="&#xE720;" 
+                                      FontSize="18" Foreground="#FF6B6B" Visibility="Collapsed"/>
                         </Grid>
                     </Button>
                     
